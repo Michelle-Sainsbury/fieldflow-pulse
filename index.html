@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>FieldFlow | Customer Analytics</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header>
+    <h1>FieldFlow</h1>
+    <p>Customer Analytics</p>
+  </header>
+
+  <main>
+   <section>
+  <h2>Weekly Business Snapshot</h2>
+  <p id="reporting-week">Reference Job Date: --</p>
+  <p>See your work order activity and operational metrics at a glance.</p>
+  
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <h3>Total Work Orders</h3>
+      <p id="total-work-orders">0</p>
+    </div>
+    
+    <div class="metric-card">
+      <h3>Total Labor Hours</h3>
+      <p id="total-labor-hours">0</p>
+    </div>
+    
+    <div class="metric-card">
+      <h3>Total Estimated Cost</h3>
+      <p id="total-estimated-cost">0</p>
+    </div>
+   <div class="metric-card">
+  <h3>Total Actual Cost</h3>
+  <p id="total-actual-cost">$0.00</p>
+</div 
+   <div class="metric-card">
+  <h3>Cost Variance</h3>
+  <p id="cost-variance">$0.00</p>
+</div>
+<div class="metric-card">
+  <h3>Completion Rate</h3>
+  <p id="completion-rate">0%</p>
+</div>
+    <div class="metric-card">
+      <h3>Routine Priority Work Orders</h3>
+      <p id="routine-priority-work-orders">0</p>
+    </div>
+  </div>
+  <div class="project-summary">
+  <div>
+  
+    <h3>Work Order Status</h3>
+    <p id="work-order-status">Loading...</p>
+  </div>
+  
+  <div>
+    <h3>Completed Work Orders</h3>
+    <p id="completed-work-orders">0%</p>
+  </div>
+</div>
+<h3>Work Order Activity</h3>
+<p id="weekly-schedule">Loading...</p>
+</section>
+  </main>
+
+  <script src="script.js?v=2"></script>
+</body>
+</html>
