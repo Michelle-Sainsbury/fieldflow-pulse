@@ -151,3 +151,27 @@ document.getElementById("fieldflow-jobs").textContent =
   fieldFlowJobs
   .map(job => `${job.job_date} | ${job.job_type} | ${job.status.toUpperCase()}`)
   .join("\n");
+  
+  const companySelect = document.getElementById("company-select");
+
+fieldFlowCompanies.forEach(company => {
+  const option = document.createElement("option");
+  option.value = company.customer_id;
+  option.textContent = company.business_name;
+  companySelect.appendChild(option);
+});
+
+companySelect.addEventListener("change", () => {
+  const selectedCustomerId = companySelect.value;
+  
+  const matchingJobs = selectedCustomerId ?
+    fieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
+    fieldFlowJobs;
+  
+  document.getElementById("fieldflow-jobs").textContent =
+    matchingJobs.length > 0 ?
+    matchingJobs
+    .map(job => `${job.job_date} | ${job.job_type} | ${job.status.toUpperCase()}`)
+    .join("\n") :
+    "No job activity available for this company yet.";
+});

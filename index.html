@@ -21,7 +21,12 @@
   <h2>Weekly Business Snapshot</h2>
   <p id="reporting-week">Reference Job Date: --</p>
   <p>See your work order activity and operational metrics at a glance.</p>
-  
+  <div class="company-selector">
+  <label for="company-select">Select Company:</label>
+  <select id="company-select">
+    <option value="">Choose a company</option>
+  </select>
+</div>
   <div class="metrics-grid">
     <div class="metric-card">
       <h3>Total Work Orders</h3>
@@ -96,6 +101,7 @@
   </main>
 
 <script src="data.js"></script>
+<script src="companies.js"></script>
   <script src="script.js?v=2"></script>
 </body>
 </html>
