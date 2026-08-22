@@ -56,3 +56,24 @@ section {
   white-space: pre-line;
   line-height: 1.6;
 }
+.company-selector {
+  margin: 16px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#company-select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c7d0d9;
+  font-size: 15px;
+}
+
+#company-data-note {
+  margin: 8px 0 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+}
