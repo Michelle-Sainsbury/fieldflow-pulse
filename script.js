@@ -113,7 +113,7 @@ document.getElementById("completed-work-orders").textContent =
 
 
 const workOrderStatuses = confirmedFieldFlowData
-  .map(record => record.status)
+  .map(record => record.work_order_number + " — " + record.status)
   .join(" • ");
 
 document.getElementById("work-order-status").textContent = workOrderStatuses;
@@ -141,11 +141,7 @@ const reportingWeek = confirmedFieldFlowData[0].job_date;
 
 document.getElementById("reporting-week").textContent =
   "Reference Job Date: " + reportingWeek;
-  const weeklySchedule = confirmedFieldFlowData
-  .map(record => record.work_order_number + " — " + record.status)
-  .join(" • ");
-
-document.getElementById("weekly-schedule").textContent = weeklySchedule;
+  
 
 document.getElementById("fieldflow-jobs").textContent =
   fieldFlowJobs
@@ -174,11 +170,48 @@ document.getElementById("company-data-note").textContent =
   const matchingJobs = selectedCustomerId ?
     fieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
     fieldFlowJobs;
-  
+  document.getElementById("total-work-orders").textContent = matchingJobs.length;
+  const completedJobs = matchingJobs.filter(
+  job => job.status === "completed"
+).length;
+
+document.getElementById("completed-work-orders").textContent = completedJobs;
+const scheduledJobs = matchingJobs.filter(
+  job => job.status === "scheduled"
+).length;
+
+document.getElementById("scheduled-jobs").textContent = scheduledJobs;
+const canceledJobs = matchingJobs.filter(
+  job => job.status === "canceled"
+).length;
+
+document.getElementById("canceled-jobs").textContent = canceledJobs;
   document.getElementById("fieldflow-jobs").textContent =
     matchingJobs.length > 0 ?
     matchingJobs
     .map(job => `${job.job_date} | ${job.job_type} | ${job.status.toUpperCase()}`)
     .join("\n") :
     "No job activity available for this company yet.";
+const jobCompletionRate =
+  matchingJobs.length > 0 ?
+  (completedJobs / matchingJobs.length) * 100 :
+  0;
+
+document.getElementById("completion-rate").textContent =
+  jobCompletionRate.toFixed(1) + "%";
+const canceledRate =
+  matchingJobs.length > 0 ?
+  (canceledJobs / matchingJobs.length) * 100 :
+  0;
+  document.getElementById("canceled-rate").textContent = canceledRate.toFixed(1) + "%";
+  document.getElementById("total-labor-hours").textContent = "0.00";
+document.getElementById("total-estimated-cost").textContent = "$0.00";
+document.getElementById("total-actual-cost").textContent = "$0.00";
+document.getElementById("cost-variance").textContent = "$0.00";
+document.getElementById("routine-priority-work-orders").textContent = "0";
+document.getElementById("average-cost-per-work-order").textContent = "$0.00";
+document.getElementById("average-labor-hours").textContent = "0.00";
+document.getElementById("total-due").textContent = "$0.00";
+document.getElementById("total-collected").textContent = "$0.00";
+document.getElementById("outstanding-balance").textContent = "$0.00";
 });
