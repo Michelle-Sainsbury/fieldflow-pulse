@@ -77,6 +77,8 @@ const totalActualCost = confirmedFieldFlowData.reduce(
   0
 );
 const costVariance = totalEstimatedCost - totalActualCost;
+const averageCostPerWorkOrder =
+  totalWorkOrders > 0 ? totalActualCost / totalWorkOrders : 0;
   const routinePriorityWorkOrders = confirmedFieldFlowData.filter(
   record => record.priority === "routine"
 ).length;
@@ -99,6 +101,8 @@ document.getElementById("total-labor-hours").textContent = totalLaborHours.toFix
 document.getElementById("total-estimated-cost").textContent = "$" + totalEstimatedCost.toFixed(2);
 document.getElementById("routine-priority-work-orders").textContent = routinePriorityWorkOrders;
 document.getElementById("total-actual-cost").textContent = "$" + totalActualCost.toFixed(2);
+document.getElementById("average-cost-per-work-order").textContent =
+  "$" + averageCostPerWorkOrder.toFixed(2);
 document.getElementById("cost-variance").textContent = "$" + costVariance.toFixed(2);
 document.getElementById("completion-rate").textContent = completionRate.toFixed(1) + "%";
 const reportingWeek = confirmedFieldFlowData[0].job_date;
