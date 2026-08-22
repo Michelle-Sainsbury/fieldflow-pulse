@@ -150,4 +150,4 @@ document.getElementById("weekly-schedule").textContent = weeklySchedule;
 document.getElementById("fieldflow-jobs").textContent =
   fieldFlowJobs
   .map(job => `${job.job_date} | ${job.job_type} | ${job.status}`)
-  .join(" • ");
+  .join("\n");

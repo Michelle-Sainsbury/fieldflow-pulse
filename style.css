@@ -52,3 +52,7 @@ section {
   font-size: 32px;
   font-weight: bold;
 }
+#fieldflow-jobs {
+  white-space: pre-line;
+  line-height: 1.6;
+}
