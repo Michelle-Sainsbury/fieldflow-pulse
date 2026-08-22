@@ -39,7 +39,10 @@ const confirmedFieldFlowData = [
     labor_hours: 3.05,
     estimated_cost: 92.81,
     actual_cost: 84.57,
-    technician_name: "Tariq Silva"
+    technician_name: "Tariq Silva",
+   invoice_status: "paid",
+  total_due: 91.76,
+  total_paid_to_date: 91.76 
   },
   {
     work_order_number: "WO-2026-00002",
@@ -49,7 +52,10 @@ const confirmedFieldFlowData = [
     labor_hours: 4.21,
     estimated_cost: 567.35,
     actual_cost: 573.21,
-    technician_name: "Tariq Silva"
+    technician_name: "Tariq Silva",
+  invoice_status: "paid",
+  total_due: 621.93,
+  total_paid_to_date: 621.93
   },
   {
     work_order_number: "WO-2026-00006",
@@ -59,7 +65,10 @@ const confirmedFieldFlowData = [
     labor_hours: 3.66,
     estimated_cost: 467.37,
     actual_cost: 0,
-    technician_name: "Tariq Silva"
+    technician_name: "Tariq Silva",
+  invoice_status: "not_invoiced",
+  total_due: 0,
+  total_paid_to_date: 0
   }
 ];
 const totalWorkOrders = confirmedFieldFlowData.length;
@@ -76,6 +85,17 @@ const totalActualCost = confirmedFieldFlowData.reduce(
   (total, record) => total + record.actual_cost,
   0
 );
+const totalDue = confirmedFieldFlowData.reduce(
+  (total, record) => total + record.total_due,
+  0
+);
+
+const totalCollected = confirmedFieldFlowData.reduce(
+  (total, record) => total + record.total_paid_to_date,
+  0
+);
+
+const outstandingBalance = totalDue - totalCollected;
 const costVariance = totalEstimatedCost - totalActualCost;
 const averageCostPerWorkOrder =
   totalWorkOrders > 0 ? totalActualCost / totalWorkOrders : 0;
@@ -103,6 +123,14 @@ document.getElementById("total-labor-hours").textContent = totalLaborHours.toFix
 document.getElementById("total-estimated-cost").textContent = "$" + totalEstimatedCost.toFixed(2);
 document.getElementById("routine-priority-work-orders").textContent = routinePriorityWorkOrders;
 document.getElementById("total-actual-cost").textContent = "$" + totalActualCost.toFixed(2);
+document.getElementById("total-due").textContent =
+  "$" + totalDue.toFixed(2);
+
+document.getElementById("total-collected").textContent =
+  "$" + totalCollected.toFixed(2);
+
+document.getElementById("outstanding-balance").textContent =
+  "$" + outstandingBalance.toFixed(2);
 document.getElementById("average-cost-per-work-order").textContent =
   "$" + averageCostPerWorkOrder.toFixed(2);
   document.getElementById("average-labor-hours").textContent =
@@ -118,3 +146,8 @@ document.getElementById("reporting-week").textContent =
   .join(" • ");
 
 document.getElementById("weekly-schedule").textContent = weeklySchedule;
+
+document.getElementById("fieldflow-jobs").textContent =
+  fieldFlowJobs
+  .map(job => `${job.job_date} | ${job.job_type} | ${job.status}`)
+  .join(" • ");
