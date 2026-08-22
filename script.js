@@ -163,7 +163,14 @@ fieldFlowCompanies.forEach(company => {
 
 companySelect.addEventListener("change", () => {
   const selectedCustomerId = companySelect.value;
-  
+  const selectedCompany = fieldFlowCompanies.find(
+  company => company.customer_id === selectedCustomerId
+);
+
+document.getElementById("company-data-note").textContent =
+  selectedCompany ?
+  `Showing available job activity for ${selectedCompany.business_name}. Detailed company metrics will populate when full analytics data is available.` :
+  "Detailed company metrics will populate when full analytics data is available.";
   const matchingJobs = selectedCustomerId ?
     fieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
     fieldFlowJobs;
