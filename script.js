@@ -112,11 +112,7 @@ document.getElementById("completed-work-orders").textContent =
   completedWorkOrders;
 
 
-const workOrderStatuses = confirmedFieldFlowData
-  .map(record => record.work_order_number + " — " + record.status)
-  .join(" • ");
 
-document.getElementById("work-order-status").textContent = workOrderStatuses;
 
 document.getElementById("total-work-orders").textContent = totalWorkOrders;
 document.getElementById("total-labor-hours").textContent = totalLaborHours.toFixed(2);
@@ -137,10 +133,7 @@ document.getElementById("average-cost-per-work-order").textContent =
   averageLaborHours.toFixed(2);
 document.getElementById("cost-variance").textContent = "$" + costVariance.toFixed(2);
 document.getElementById("completion-rate").textContent = completionRate.toFixed(1) + "%";
-const reportingWeek = confirmedFieldFlowData[0].job_date;
 
-document.getElementById("reporting-week").textContent =
-  "Reference Job Date: " + reportingWeek;
   
 
 document.getElementById("fieldflow-jobs").textContent =
@@ -170,6 +163,19 @@ document.getElementById("company-data-note").textContent =
   const matchingJobs = selectedCustomerId ?
     fieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
     fieldFlowJobs;
+    const jobTypeCounts = matchingJobs.reduce((counts, job) => {
+  counts[job.job_type] = (counts[job.job_type] || 0) + 1;
+  return counts;
+}, {});
+
+const jobTypeBreakdown =
+  matchingJobs.length > 0 ?
+  Object.entries(jobTypeCounts)
+  .map(([jobType, count]) => `${jobType} — ${count}`)
+  .join(" • ") :
+  "No job type data available for this company yet.";
+
+document.getElementById("job-type-breakdown").textContent = jobTypeBreakdown;
   document.getElementById("total-work-orders").textContent = matchingJobs.length;
   const completedJobs = matchingJobs.filter(
   job => job.status === "completed"
