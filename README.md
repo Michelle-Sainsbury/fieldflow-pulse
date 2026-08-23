@@ -14,3 +14,8 @@ FieldFlow Pulse works alongside three other products in the FieldFlow suite:
 - **Product D – FieldFlow Pulse:** Turns scheduled job and client activity data into a simple weekly business summary for contractors.
 
 Together, the four products use FieldFlow's shared data structure to support scheduling, internal operations, customer support, and business analytics.
+## Current Data Status
+
+Product D currently uses the available shared FieldFlow job and customer data. The Customer Analytics dashboard displays verified work-order activity for companies with matching job records in the provided dataset.
+
+Companies without matching job records correctly display zero work orders and no job activity. Analytics that require fields not currently available in the shared dataset display N/A rather than unsupported or fabricated values.
