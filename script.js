@@ -210,14 +210,79 @@ const canceledRate =
   (canceledJobs / matchingJobs.length) * 100 :
   0;
   document.getElementById("canceled-rate").textContent = canceledRate.toFixed(1) + "%";
-  document.getElementById("total-labor-hours").textContent = "0.00";
-document.getElementById("total-estimated-cost").textContent = "$0.00";
-document.getElementById("total-actual-cost").textContent = "$0.00";
-document.getElementById("cost-variance").textContent = "$0.00";
-document.getElementById("routine-priority-work-orders").textContent = "0";
-document.getElementById("average-cost-per-work-order").textContent = "$0.00";
-document.getElementById("average-labor-hours").textContent = "0.00";
-document.getElementById("total-due").textContent = "$0.00";
-document.getElementById("total-collected").textContent = "$0.00";
-document.getElementById("outstanding-balance").textContent = "$0.00";
+  const totalLaborHours = matchingJobs.reduce(
+  (sum, job) => sum + (Number(job.labor_hours) || 0),
+  0
+);
+
+document.getElementById("total-labor-hours").textContent =
+  matchingJobs.some(job => job.labor_hours !== undefined) ?
+  totalLaborHours.toFixed(2) :
+  "N/A";
+const totalEstimatedCost = matchingJobs.reduce(
+  (sum, job) => sum + (Number(job.estimated_cost) || 0),
+  0
+);
+
+document.getElementById("total-estimated-cost").textContent =
+  matchingJobs.some(job => job.estimated_cost !== undefined) ?
+  "$" + totalEstimatedCost.toFixed(2) :
+  "N/A";
+document.getElementById("total-actual-cost").textContent = "N/A";
+document.getElementById("cost-variance").textContent = "N/A";
+document.getElementById("routine-priority-work-orders").textContent = "N/A";
+const completedJobsForCost = matchingJobs.filter(
+  job => job.status === "completed" && job.actual_cost !== undefined
+);
+
+const averageCostPerWorkOrder =
+  completedJobsForCost.length > 0 ?
+  completedJobsForCost.reduce(
+    (sum, job) => sum + (Number(job.actual_cost) || 0),
+    0
+  ) / completedJobsForCost.length :
+  null;
+
+document.getElementById("average-cost-per-work-order").textContent =
+  averageCostPerWorkOrder !== null ?
+  "$" + averageCostPerWorkOrder.toFixed(2) :
+  "N/A";
+const completedJobsForLabor = matchingJobs.filter(
+  job => job.status === "completed" && job.labor_hours !== undefined
+);
+
+const averageLaborHours =
+  completedJobsForLabor.length > 0 ?
+  completedJobsForLabor.reduce(
+    (sum, job) => sum + (Number(job.labor_hours) || 0),
+    0
+  ) / completedJobsForLabor.length :
+  null;
+
+document.getElementById("average-labor-hours").textContent =
+  averageLaborHours !== null ?
+  averageLaborHours.toFixed(2) :
+  "N/A";
+const totalDue = matchingJobs.reduce(
+  (sum, job) => sum + (Number(job.total_due) || 0),
+  0
+);
+
+document.getElementById("total-due").textContent =
+  matchingJobs.some(job => job.total_due !== undefined) ?
+  "$" + totalDue.toFixed(2) :
+  "N/A";
+const totalCollected = matchingJobs.reduce(
+  (sum, job) => sum + (Number(job.total_paid_to_date) || 0),
+  0
+);
+
+document.getElementById("total-collected").textContent =
+  matchingJobs.some(job => job.total_paid_to_date !== undefined) ?
+  "$" + totalCollected.toFixed(2) :
+  "N/A";
+document.getElementById("outstanding-balance").textContent =
+  matchingJobs.some(job => job.total_due !== undefined && job.total_paid_to_date !== undefined) ?
+  "$" + (totalDue - totalCollected).toFixed(2) :
+  "N/A";
 });
