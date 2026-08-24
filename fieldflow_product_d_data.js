@@ -1,0 +1,68 @@
+const fieldFlowCustomerIds = {
+  "Bright Spark Electric": "cust_00001",
+  "Reliable Rooter Plumbing": "cust_00002",
+  "Spotless Sweep Cleaning Co.": "cust_00003",
+  "Solo Circuit Electrical": "cust_00004",
+  "Northside Plumbing & Drain": "cust_00005",
+  "Fresh Start Home Cleaning": "cust_00006",
+  "Cool Breeze HVAC": "cust_00007",
+  "Green Thumb Landscaping": "cust_00008",
+  "Handy Hank's Repairs": "cust_00009",
+  "TrueLine Painting": "cust_00010",
+  "Metro Electric Solutions": "cust_00011",
+  "Pipeline Pros Plumbing": "cust_00012",
+  "Sparkle & Shine Cleaners": "cust_00013",
+  "All Seasons HVAC": "cust_00014",
+  "Regional Comfort Systems": "cust_00015",
+  "Curb Appeal Landscaping Group": "cust_00016",
+  "One Call Handyman Services": "cust_00017",
+  "Precision Painters LLC": "cust_00018",
+  "Downtown Drain Doctors": "cust_00019",
+  "Citywide Cleaning Solutions": "cust_00020"
+};
+
+async function loadFieldFlowJobsFromWorkbook() {
+  const response = await fetch("./updated contractors dataset.xlsx");
+
+  if (!response.ok) {
+    throw new Error("Could not load updated contractors dataset.");
+  }
+
+  const buffer = await response.arrayBuffer();
+
+  const workbook = XLSX.read(buffer, {
+    type: "array",
+    cellDates: true
+  });
+
+  const sheet =
+    workbook.Sheets["contractors-flat.csv"] ||
+    workbook.Sheets[workbook.SheetNames[0]];
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    defval: null,
+    raw: true
+  });
+
+  const jobs = rows.map((row, index) => {
+    let jobDate = row.job_date;
+
+    if (jobDate instanceof Date) {
+      jobDate = jobDate.toISOString().slice(0, 10);
+    }
+
+    return {
+      ...row,
+      job_id:
+        row.work_order_number ||
+        `job_${String(index + 1).padStart(6, "0")}`,
+      customer_id:
+        fieldFlowCustomerIds[row.business_name] || null,
+      job_date: jobDate
+    };
+  });
+
+  console.log("Full FieldFlow jobs loaded:", jobs.length);
+
+  return jobs;
+}

@@ -19,7 +19,7 @@
   <main>
    <section>
   <h2>Weekly Business Snapshot</h2>
-  
+  <p id="week-range">Week view will appear after selecting a company.</p>
   <p>See your work order activity and operational metrics at a glance.</p>
   <div class="company-selector">
   <label for="company-select">Select Company:</label>
@@ -106,13 +106,17 @@
   <h3>Job Type Breakdown</h3>
   <p id="job-type-breakdown">Loading...</p>
 </div>
+<h3>Client Activity</h3>
+<p id="client-activity">Select a company to view client activity.</p>
 <h3>Recent Job Activity</h3>
 <p id="fieldflow-jobs">Loading...</p>
 </section>
   </main>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="data.js"></script>
 <script src="companies.js"></script>
+<script src="fieldflow_product_d_data.js"></script>
   <script src="script.js?v=2"></script>
 </body>
 </html>
