@@ -89,6 +89,84 @@
   <p id="outstanding-balance">$0.00</p>
 </div>
   </div>
+  <section class="analytics-tools">
+  <div class="analytics-tools-header">
+    <div>
+      <h3>Operational Insights</h3>
+      <p>Filter work orders and explore key performance patterns.</p>
+    </div>
+    <button id="reset-detail-filters" type="button">Reset Filters</button>
+  </div>
+  
+  <div class="analytics-filter-grid">
+    <label>
+      Priority
+      <select id="priority-filter">
+        <option value="">All priorities</option>
+      </select>
+    </label>
+    
+    <label>
+      Job Type
+      <select id="job-type-filter">
+        <option value="">All job types</option>
+      </select>
+    </label>
+    
+    <label>
+      Technician
+      <select id="technician-filter">
+        <option value="">All technicians</option>
+      </select>
+    </label>
+    
+    <label>
+      Invoice Status
+      <select id="invoice-status-filter">
+        <option value="">All invoice statuses</option>
+      </select>
+    </label>
+    
+    <label>
+      Customer Rating
+      <select id="rating-filter">
+        <option value="">All ratings</option>
+      </select>
+    </label>
+    
+    <label>
+      Follow-Up
+      <select id="follow-up-filter">
+        <option value="">All work orders</option>
+        <option value="needed">Follow-up needed</option>
+        <option value="none">No follow-up needed</option>
+      </select>
+    </label>
+  </div>
+  
+  <div class="analytics-visual-grid">
+    <article class="analytics-visual-card">
+      <h4>Invoice Status</h4>
+      <div id="invoice-status-chart" class="chart-area">
+        Select a company to view invoice status.
+      </div>
+    </article>
+    
+    <article class="analytics-visual-card">
+  <h4>Customer Feedback</h4>
+  
+  <div class="customer-feedback-summary">
+    <p><strong>Average Rating:</strong> <span id="average-rating">N/A</span></p>
+    <p><strong>Rated Work Orders:</strong> <span id="rated-work-orders">N/A</span></p>
+  </div>
+  
+  <div id="customer-rating-chart" class="chart-area">
+    Select a company to view customer feedback.
+  </div>
+</article>
+  </div>
+</section>
+
   <div class="project-summary">
 
   
@@ -111,11 +189,13 @@
 </div>
 <div>
   <h3>Job Type Breakdown</h3>
-  <p id="job-type-breakdown">Loading...</p>
+  <div id="job-type-breakdown" class="chart-area">
+  Loading...
+</div>
 </div>
 <h3>Client Activity</h3>
 <p id="client-activity">Select a company to view client activity.</p>
-<h3>Recent Job Activity</h3>
+<h3>Recent Job Activity — Year to Date</h3>
 <p id="fieldflow-jobs">Loading...</p>
 </section>
 <section class="work-order-details">

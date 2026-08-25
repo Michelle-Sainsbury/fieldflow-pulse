@@ -15,8 +15,8 @@ companySelect.addEventListener("change", async () => {
 
 document.getElementById("company-data-note").textContent =
   selectedCompany ?
-  `Showing available job activity for ${selectedCompany.business_name}. Detailed company metrics will populate when full analytics data is available.` :
-  "Detailed company metrics will populate when full analytics data is available.";
+  `Showing work order activity and operational metrics for ${selectedCompany.business_name}.` :
+  "Select a company to view work order activity and operational metrics.";
   const fullFieldFlowJobs = await loadFieldFlowJobsFromWorkbook();
 const companyJobs = selectedCustomerId ?
   fullFieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
@@ -32,8 +32,12 @@ if (companyJobs.length > 0) {
     const values = [
       job.work_order_number || job.job_id || "N/A",
       job.technician_name || "N/A",
-      job.invoice_status || "N/A",
-      job.customer_rating ?? "N/A",
+      job.invoice_status === "not_invoiced" ?
+  "Not Invoiced" :
+  job.invoice_status || "N/A",
+      Number(job.customer_rating) >= 1 && Number(job.customer_rating) <= 5 ?
+  job.customer_rating :
+  "Not rated",
       job.follow_up_date || "N/A",
       job.follow_up_notes || "N/A"
     ];
@@ -134,31 +138,269 @@ const matchingJobs = selectedWeek ?
   fullFieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
   fullFieldFlowJobs;
   
+  const priorityFilter = document.getElementById("priority-filter");
+const jobTypeFilter = document.getElementById("job-type-filter");
+const technicianFilter = document.getElementById("technician-filter");
+const invoiceStatusFilter = document.getElementById("invoice-status-filter");
+const ratingFilter = document.getElementById("rating-filter");
+const followUpFilter = document.getElementById("follow-up-filter");
+
+const currentFilters = {
+  priority: priorityFilter.value,
+  jobType: jobTypeFilter.value,
+  technician: technicianFilter.value,
+  invoiceStatus: invoiceStatusFilter.value,
+  rating: ratingFilter.value,
+  followUp: followUpFilter.value
+};
+
+function populateFilter(select, values, defaultLabel, selectedValue) {
+  select.innerHTML = `<option value="">${defaultLabel}</option>`;
+  
+  [...new Set(values.filter(value => value !== null && value !== undefined && value !== ""))]
+  .sort((a, b) => String(a).localeCompare(String(b)))
+    .forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+    });
+  
+  if ([...select.options].some(option => option.value === String(selectedValue))) {
+    select.value = selectedValue;
+  }
+}
+
+populateFilter(
+  priorityFilter,
+  matchingJobs.map(job => job.priority),
+  "All priorities",
+  currentFilters.priority
+);
+
+populateFilter(
+  jobTypeFilter,
+  matchingJobs.map(job => job.job_type),
+  "All job types",
+  currentFilters.jobType
+);
+
+populateFilter(
+  technicianFilter,
+  matchingJobs.map(job => job.technician_name),
+  "All technicians",
+  currentFilters.technician
+);
+
+populateFilter(
+  invoiceStatusFilter,
+  matchingJobs.map(job => job.invoice_status),
+  "All invoice statuses",
+  currentFilters.invoiceStatus
+);
+
+populateFilter(
+  ratingFilter,
+  matchingJobs.map(job => job.customer_rating),
+  "All ratings",
+  currentFilters.rating
+);
+
+const filteredInsightJobs = matchingJobs.filter(job => {
+  const hasFollowUp =
+    Boolean(job.follow_up_date) ||
+    Boolean(job.follow_up_notes);
+  
+  return (
+    (!priorityFilter.value || String(job.priority) === priorityFilter.value) &&
+    (!jobTypeFilter.value || String(job.job_type) === jobTypeFilter.value) &&
+    (!technicianFilter.value || String(job.technician_name) === technicianFilter.value) &&
+    (!invoiceStatusFilter.value || String(job.invoice_status) === invoiceStatusFilter.value) &&
+    (!ratingFilter.value || String(job.customer_rating) === ratingFilter.value) &&
+    (
+      !followUpFilter.value ||
+      (followUpFilter.value === "needed" && hasFollowUp) ||
+      (followUpFilter.value === "none" && !hasFollowUp)
+    )
+  );
+});
+workOrderDetailsBody.innerHTML = "";
+
+if (filteredInsightJobs.length > 0) {
+  filteredInsightJobs.forEach(job => {
+    const row = document.createElement("tr");
+    
+    const values = [
+      job.work_order_number || job.job_id || "N/A",
+      job.technician_name || "N/A",
+      job.invoice_status || "N/A",
+      Number(job.customer_rating) >= 1 && Number(job.customer_rating) <= 5 ?
+  job.customer_rating :
+  "Not rated",
+      job.follow_up_date || "N/A",
+      job.follow_up_notes || "N/A"
+    ];
+    
+    values.forEach(value => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
+    });
+    
+    workOrderDetailsBody.appendChild(row);
+  });
+} else {
+  const row = document.createElement("tr");
+  const cell = document.createElement("td");
+  
+  cell.colSpan = 6;
+  cell.textContent = "No work order details available for the current filters.";
+  
+  row.appendChild(cell);
+  workOrderDetailsBody.appendChild(row);
+}
+const invoiceCounts = filteredInsightJobs.reduce((counts, job) => {
+  const status = job.invoice_status || "Unknown";
+  counts[status] = (counts[status] || 0) + 1;
+  return counts;
+}, {});
+
+const ratingCounts = filteredInsightJobs.reduce((counts, job) => {
+  const rating = Number(job.customer_rating);
+  
+  if (rating >= 1 && rating <= 5) {
+    const label = `${rating}`;
+    counts[label] = (counts[label] || 0) + 1;
+  }
+  
+  return counts;
+}, {});
+
+const validRatings = filteredInsightJobs
+  .map(job => Number(job.customer_rating))
+  .filter(rating => rating >= 1 && rating <= 5);
+
+const averageRating =
+  validRatings.length > 0 ?
+  (validRatings.reduce((sum, rating) => sum + rating, 0) / validRatings.length).toFixed(1) :
+  "N/A";
+
+document.getElementById("average-rating").textContent =
+  averageRating === "N/A" ? "N/A" : `${averageRating} / 5`;
+
+document.getElementById("rated-work-orders").textContent =
+  `${validRatings.length} of ${filteredInsightJobs.length}`;
+
+const invoiceChart = document.getElementById("invoice-status-chart");
+
+if (Object.keys(invoiceCounts).length > 0) {
+  const maxInvoiceCount = Math.max(...Object.values(invoiceCounts));
+  
+  invoiceChart.innerHTML = Object.entries(invoiceCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([status, count]) => {
+      const width = maxInvoiceCount > 0 ?
+        Math.round((count / maxInvoiceCount) * 100) :
+        0;
+      
+      const label = status
+        .replaceAll("_", " ")
+        .replace(/\b\w/g, letter => letter.toUpperCase());
+      
+      return `
+        <div class="insight-bar-row">
+          <div class="insight-bar-label">
+            <span>${label}</span>
+            <strong>${count}</strong>
+          </div>
+          <div class="insight-bar-track">
+            <div class="insight-bar-fill" style="width: ${width}%"></div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+} else {
+  invoiceChart.innerHTML =
+    '<p class="no-insight-data">No invoice-status data for the current filters.</p>';
+}
+
+
+const ratingChart = document.getElementById("customer-rating-chart");
+
+if (Object.keys(ratingCounts).length > 0) {
+  const maxRatingCount = Math.max(...Object.values(ratingCounts));
+  
+  ratingChart.innerHTML = Object.entries(ratingCounts)
+    .sort((a, b) => Number(b[0]) - Number(a[0]))
+    .map(([rating, count]) => {
+      const width = maxRatingCount > 0 ?
+        Math.round((count / maxRatingCount) * 100) :
+        0;
+      
+      return `
+        <div class="insight-bar-row">
+          <div class="insight-bar-label">
+            <span>${rating} star</span>
+            <strong>${count}</strong>
+          </div>
+          <div class="insight-bar-track">
+            <div class="insight-bar-fill" style="width: ${width}%"></div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+} else {
+  ratingChart.innerHTML =
+    '<p class="no-insight-data">No customer-rating data for the current filters.</p>';
+}
     const jobTypeCounts = matchingJobs.reduce((counts, job) => {
   counts[job.job_type] = (counts[job.job_type] || 0) + 1;
   return counts;
 }, {});
 
-const jobTypeBreakdown =
-  matchingJobs.length > 0 ?
-  Object.entries(jobTypeCounts)
-  .map(([jobType, count]) => `${jobType} — ${count}`)
-  .join(" • ") :
-  "No job type data available for this company yet.";
+const jobTypeEntries = Object.entries(jobTypeCounts);
 
-document.getElementById("job-type-breakdown").textContent = jobTypeBreakdown;
-  document.getElementById("total-work-orders").textContent = matchingJobs.length;
-  const completedJobs = matchingJobs.filter(
+const jobTypeBreakdown = document.getElementById("job-type-breakdown");
+
+if (jobTypeEntries.length > 0) {
+  const maxJobTypeCount = Math.max(...jobTypeEntries.map(([, count]) => count));
+  
+  jobTypeBreakdown.innerHTML = jobTypeEntries
+    .sort((a, b) => b[1] - a[1])
+    .map(([jobType, count]) => {
+      const width = Math.round((count / maxJobTypeCount) * 100);
+      
+      return `
+        <div class="insight-bar-row">
+          <div class="insight-bar-label">
+            <span>${jobType}</span>
+            <strong>${count}</strong>
+          </div>
+          <div class="insight-bar-track">
+            <div class="insight-bar-fill" style="width: ${width}%"></div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+} else {
+  jobTypeBreakdown.innerHTML =
+    '<p class="no-insight-data">No job type data available for the current filters.</p>';
+}
+  document.getElementById("total-work-orders").textContent = filteredInsightJobs.length;
+  const completedJobs = filteredInsightJobs.filter(
   job => job.status === "completed"
 ).length;
 
 document.getElementById("completed-work-orders").textContent = completedJobs;
-const scheduledJobs = matchingJobs.filter(
+const scheduledJobs = filteredInsightJobs.filter(
   job => job.status === "scheduled"
 ).length;
 
 document.getElementById("scheduled-jobs").textContent = scheduledJobs;
-const canceledJobs = matchingJobs.filter(
+const canceledJobs = filteredInsightJobs.filter(
   job => job.status === "canceled"
 ).length;
 
@@ -212,7 +454,11 @@ const costVariance = totalEstimatedCost - totalActualCost;
 
 document.getElementById("cost-variance").textContent =
   matchingJobs.some(job => job.estimated_cost !== undefined && job.actual_cost !== undefined) ?
-  "$" + costVariance.toFixed(2) :
+  costVariance > 0 ?
+  "$" + Math.abs(costVariance).toFixed(2) + " Under Estimate" :
+  costVariance < 0 ?
+  "$" + Math.abs(costVariance).toFixed(2) + " Over Estimate" :
+  "$0.00 On Estimate" :
   "N/A";
 const routinePriorityWorkOrders = matchingJobs.filter(
   job => job.priority === "routine"
@@ -289,5 +535,32 @@ document.getElementById("client-activity").textContent =
   
 });
 document.getElementById("week-select").addEventListener("change", () => {
+  companySelect.dispatchEvent(new Event("change"));
+});
+
+[
+  "priority-filter",
+  "job-type-filter",
+  "technician-filter",
+  "invoice-status-filter",
+  "rating-filter",
+  "follow-up-filter"
+].forEach(id => {
+  document.getElementById(id).addEventListener("change", () => {
+    companySelect.dispatchEvent(new Event("change"));
+  });
+});
+document.getElementById("reset-detail-filters").addEventListener("click", () => {
+  [
+    "priority-filter",
+    "job-type-filter",
+    "technician-filter",
+    "invoice-status-filter",
+    "rating-filter",
+    "follow-up-filter"
+  ].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  
   companySelect.dispatchEvent(new Event("change"));
 });
