@@ -18,5 +18,10 @@ const fieldFlowCompanies = [
   { customer_id: "cust_00017", business_name: "One Call Handyman Services" },
   { customer_id: "cust_00018", business_name: "Precision Painters LLC" },
   { customer_id: "cust_00019", business_name: "Downtown Drain Doctors" },
-  { customer_id: "cust_00020", business_name: "Citywide Cleaning Solutions" }
+  { customer_id: "cust_00020", business_name: "Citywide Cleaning Solutions" },
+  { customer_id: "cust_00021", business_name: "Ironclad Electric" },
+{ customer_id: "cust_00022", business_name: "Neighborhood Plumbing Co." },
+{ customer_id: "cust_00023", business_name: "Cascade Home Services" },
+{ customer_id: "cust_00024", business_name: "Meridian Home Solutions" },
+{ customer_id: "cust_00025", business_name: "Vantage Group Home Services" }
 ];

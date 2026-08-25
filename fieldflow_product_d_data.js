@@ -18,7 +18,12 @@ const fieldFlowCustomerIds = {
   "One Call Handyman Services": "cust_00017",
   "Precision Painters LLC": "cust_00018",
   "Downtown Drain Doctors": "cust_00019",
-  "Citywide Cleaning Solutions": "cust_00020"
+  "Citywide Cleaning Solutions": "cust_00020",
+  "Ironclad Electric": "cust_00021",
+  "Neighborhood Plumbing Co.": "cust_00022",
+  "Cascade Home Services": "cust_00023",
+  "Meridian Home Solutions": "cust_00024",
+  "Vantage Group Home Services": "cust_00025"
 };
 
 async function loadFieldFlowJobsFromWorkbook() {
