@@ -22,29 +22,44 @@ const fieldFlowCustomerIds = {
 };
 
 async function loadFieldFlowJobsFromWorkbook() {
-  const response = await fetch("./updated contractors dataset.xlsx");
+  async function loadWorkbook(fileName, preferredSheetName) {
+    const response = await fetch(fileName);
 
-  if (!response.ok) {
-    throw new Error("Could not load updated contractors dataset.");
+    if (!response.ok) {
+      throw new Error(`Could not load ${fileName}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    const workbook = XLSX.read(buffer, {
+      type: "array",
+      cellDates: true
+    });
+
+    const sheet =
+      workbook.Sheets[preferredSheetName] ||
+      workbook.Sheets[workbook.SheetNames[0]];
+
+    return XLSX.utils.sheet_to_json(sheet, {
+      defval: null,
+      raw: true
+    });
   }
 
-  const buffer = await response.arrayBuffer();
+  const [contractorRows, syntheticRows] = await Promise.all([
+    loadWorkbook(
+      "./updated contractors dataset.xlsx",
+      "contractors-flat.csv"
+    ),
+    loadWorkbook(
+      "./synthetic dataset.xlsx",
+      "businesses-flat.csv"
+    )
+  ]);
 
-  const workbook = XLSX.read(buffer, {
-    type: "array",
-    cellDates: true
-  });
+  const allRows = [...contractorRows, ...syntheticRows];
 
-  const sheet =
-    workbook.Sheets["contractors-flat.csv"] ||
-    workbook.Sheets[workbook.SheetNames[0]];
-
-  const rows = XLSX.utils.sheet_to_json(sheet, {
-    defval: null,
-    raw: true
-  });
-
-  const jobs = rows.map((row, index) => {
+  const jobs = allRows.map((row, index) => {
     let jobDate = row.job_date;
 
     if (jobDate instanceof Date) {
@@ -62,7 +77,14 @@ async function loadFieldFlowJobsFromWorkbook() {
     };
   });
 
-  console.log("Full FieldFlow jobs loaded:", jobs.length);
+  console.log(
+    "FieldFlow jobs loaded:",
+    jobs.length,
+    "Contractors:",
+    contractorRows.length,
+    "Synthetic:",
+    syntheticRows.length
+  );
 
   return jobs;
 }
