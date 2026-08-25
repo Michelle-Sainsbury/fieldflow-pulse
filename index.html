@@ -27,6 +27,13 @@
     <option value="">Choose a company</option>
   </select>
 </div>
+<div class="week-selector">
+  <label for="week-select">Select Week:</label>
+  <select id="week-select">
+    <option value="">Latest week</option>
+  </select>
+  <p id="week-range"></p>
+</div>
 <p id="company-data-note">Detailed company metrics will populate when full analytics data is available.</p>
   <div class="metrics-grid">
     <div class="metric-card">
@@ -110,6 +117,29 @@
 <p id="client-activity">Select a company to view client activity.</p>
 <h3>Recent Job Activity</h3>
 <p id="fieldflow-jobs">Loading...</p>
+</section>
+<section class="work-order-details">
+  <h3>Work Order Details & Follow-Up</h3>
+  
+  <div class="work-order-table-wrap">
+    <table class="work-order-table">
+      <thead>
+        <tr>
+          <th>Work Order #</th>
+          <th>Technician</th>
+          <th>Invoice Status</th>
+          <th>Customer Rating</th>
+          <th>Follow-Up Date</th>
+          <th>Follow-Up Notes</th>
+        </tr>
+      </thead>
+      <tbody id="work-order-details-body">
+        <tr>
+          <td colspan="6">Select a company to view work order details.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </section>
   </main>
 

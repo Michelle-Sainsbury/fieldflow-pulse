@@ -21,6 +21,41 @@ document.getElementById("company-data-note").textContent =
 const companyJobs = selectedCustomerId ?
   fullFieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
   fullFieldFlowJobs;
+  const workOrderDetailsBody = document.getElementById("work-order-details-body");
+
+workOrderDetailsBody.innerHTML = "";
+
+if (companyJobs.length > 0) {
+  companyJobs.forEach(job => {
+    const row = document.createElement("tr");
+    
+    const values = [
+      job.work_order_number || job.job_id || "N/A",
+      job.technician_name || "N/A",
+      job.invoice_status || "N/A",
+      job.customer_rating ?? "N/A",
+      job.follow_up_date || "N/A",
+      job.follow_up_notes || "N/A"
+    ];
+    
+    values.forEach(value => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
+    });
+    
+    workOrderDetailsBody.appendChild(row);
+  });
+} else {
+  const row = document.createElement("tr");
+  const cell = document.createElement("td");
+  
+  cell.colSpan = 6;
+  cell.textContent = "No work order details available for this company.";
+  
+  row.appendChild(cell);
+  workOrderDetailsBody.appendChild(row);
+}
   const datedCompanyJobs = companyJobs
   .filter(job => job.job_date)
   .map(job => ({
@@ -36,7 +71,38 @@ const latestJobDate =
     )
   ) :
   null;
-  const weekStart = latestJobDate ? new Date(latestJobDate) : null;
+  
+  const weekSelect = document.getElementById("week-select");
+const selectedWeek = weekSelect.value;
+weekSelect.innerHTML = '<option value="">Latest week</option>';
+
+const availableWeeks = [
+  ...new Set(
+    datedCompanyJobs.map(job => {
+      const d = new Date(job.parsedJobDate);
+      const day = d.getDay();
+      const daysToMonday = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + daysToMonday);
+      return d.toISOString().slice(0, 10);
+    })
+  )
+].sort().reverse();
+
+availableWeeks.forEach(week => {
+  const option = document.createElement("option");
+  option.value = week;
+  option.textContent = `Week of ${new Date(
+    week + "T00:00:00"
+  ).toLocaleDateString()}`;
+  weekSelect.appendChild(option);
+});
+
+weekSelect.value = selectedWeek;
+const weekStart = selectedWeek ?
+  new Date(selectedWeek + "T00:00:00") :
+  latestJobDate ?
+  new Date(latestJobDate) :
+  null;
 
 if (weekStart) {
   const day = weekStart.getDay();
@@ -62,9 +128,12 @@ document.getElementById("week-range").textContent =
   weekStart && weekEnd ?
   `Week of ${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}` :
   "No dated work orders available for this company.";
-const matchingJobs = selectedCustomerId ?
+const matchingJobs = selectedWeek ?
+  weeklyJobs :
+  selectedCustomerId ?
   fullFieldFlowJobs.filter(job => job.customer_id === selectedCustomerId) :
   fullFieldFlowJobs;
+  
     const jobTypeCounts = matchingJobs.reduce((counts, job) => {
   counts[job.job_type] = (counts[job.job_type] || 0) + 1;
   return counts;
@@ -218,4 +287,7 @@ document.getElementById("client-activity").textContent =
   `${uniqueClients.length} unique clients` :
   "No client activity available for this company.";
   
+});
+document.getElementById("week-select").addEventListener("change", () => {
+  companySelect.dispatchEvent(new Event("change"));
 });
